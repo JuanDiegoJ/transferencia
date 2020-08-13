@@ -1,6 +1,6 @@
 from rest_framework import serializers
-
 from .models import Expediente, InformacionGeneral
+from applications.utilidades.models import TipoActoAdministrativo
 from applications.utilidades.serializers import TipoActoAdministrativoSerializer, TramiteSerializer
 from applications.users.serializers import UserSerializer
 
@@ -14,7 +14,7 @@ class InformacionGeneralSerializer(serializers.ModelSerializer):
 
 class ExpedienteSerializerViewset(serializers.Serializer):
 
-    id = serializers.IntegerField()
+    pk = serializers.IntegerField()
     no_radicacion = serializers.CharField()
     documento_final = serializers.CharField()
     fecha_radicacion = serializers.DateField()
@@ -30,10 +30,13 @@ class ExpedienteSerializerViewset(serializers.Serializer):
         query = InformacionGeneral.objects.filter(
             no_radicacion = obj.id
         )
-        print(query)
-        productos_serializados = InformacionGeneralSerializer(query, many=True).data
-        print(productos_serializados)
-        return productos_serializados
+        informacion_expediente = InformacionGeneralSerializer(query, many=True).data
+        return informacion_expediente
+
+
+class ArrayIntegerSerializer(serializers.ListField):
+
+    child = serializers.IntegerField()
 
 
 class ExpedienteCreacion(serializers.Serializer):
@@ -45,8 +48,8 @@ class ExpedienteCreacion(serializers.Serializer):
     fecha_ejecutoria = serializers.DateField()
     fecha_inicio = serializers.DateField()
     fecha_final = serializers.DateField()
-    tipo_acto_administrativo = TipoActoAdministrativoSerializer()
-    usuario = UserSerializer()
+    tipo_acto_administrativo = serializers.IntegerField()
     tramite = serializers.IntegerField()
     alcaldia = serializers.IntegerField()
     urbanizacion = serializers.CharField()
+    modalidades = ArrayIntegerSerializer()

@@ -19,7 +19,7 @@ class TipoActoAdministrativoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TipoActoAdministrativo
-        fields = ('id')
+        fields = ('id', )
 
 
 class TramiteSerializer(serializers.ModelSerializer):
