@@ -23,7 +23,6 @@ class ExpedienteViewset(viewsets.ViewSet):
     def create(self, request):
 
         serializer =ExpedienteCreacion(data=request.data)
-        #Valida que la información sea correcta
         serializer.is_valid(raise_exception=True)
 
         exp = Expediente.objects.create(
@@ -37,6 +36,7 @@ class ExpedienteViewset(viewsets.ViewSet):
             tipo_acto_administrativo = TipoActoAdministrativo.objects.filter(id=serializer.validated_data['tipo_acto_administrativo']).get(),
             #usuario = self.request.user
         )
+
         inf = InformacionGeneral.objects.create(
             no_radicacion = exp,
             tramite = Tramite.objects.filter(id=serializer.validated_data['tramite']).get(),
@@ -54,10 +54,16 @@ class ExpedienteViewset(viewsets.ViewSet):
 
         return  Response({
             'ok': 'ok',
-            'data': serializer.data
+            'data': exp.id
         })
 
     def retrieve(self, request, pk=None):
-        venta = get_object_or_404(Expediente.objects.all(), pk=pk)
-        serializer = ExpedienteSerializerViewset(venta)
+        expediente = get_object_or_404(Expediente.objects.all(), pk=pk)
+        serializer = ExpedienteSerializerViewset(expediente)
+        return Response(serializer.data)
+
+    def partial_update(self, request, pk=None):
+        expediente = get_object_or_404(Expediente.objects.all(), pk=pk)
+        serializer = ExpedienteCreacion(expediente)
+        print(expediente)
         return Response(serializer.data)

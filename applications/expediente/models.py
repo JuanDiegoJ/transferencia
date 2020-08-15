@@ -6,6 +6,7 @@ from applications.utilidades.models import (
     Alcaldia,
     Modalidades
 )
+from .managers import ExpedienteManager
 from applications.users.models import User
 # Create your models here.
 
@@ -62,6 +63,8 @@ class Expediente(TimeStampedModel):
         null = True
     )
 
+    objects = ExpedienteManager()
+
     def __str__(self):
         return f'{str(self.no_radicacion)}'
 
@@ -77,7 +80,8 @@ class InformacionGeneral(TimeStampedModel):
     no_radicacion = models.OneToOneField(
         Expediente,
         on_delete=models.CASCADE,
-        primary_key=True
+        primary_key=True,
+        related_name = 'expediente_informacion'
     )
     tramite = models.ForeignKey(
         Tramite,
@@ -95,6 +99,8 @@ class InformacionGeneral(TimeStampedModel):
         blank = True
     )
     modalidades = models.ManyToManyField(Modalidades, blank = True)
+
+    objects = ExpedienteManager()
 
     def __str__(self):
         return self.no_radicacion.no_radicacion
