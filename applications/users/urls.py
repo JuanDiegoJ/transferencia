@@ -17,7 +17,7 @@ urlpatterns = [
     ),
     path(
         'api/renew/',
-        TokenRefreshView.as_view(),
+        views.LoginAPI.as_view(),
         name='renew'
     ),
 ]

@@ -1,5 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 import json
+import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from unipath import Path
@@ -44,14 +45,13 @@ LOCAL_APPS = (
 
 THIRD_PARTY_APPS = (
     'rest_framework',
+    'corsheaders'
 )
     #'rest_framework.authtoken',
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'applications.users.backends.JWTAuthentication',
     ]
 }
 
@@ -60,6 +60,7 @@ INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -120,3 +121,10 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+# JWT
+JWT_SECRET_KEY = get_secret('JWT_SECRET_KEY')
+
+CORS_ALLOWED_ORIGINS  = [
+     "http://localhost:3000", 
+]

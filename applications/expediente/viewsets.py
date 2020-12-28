@@ -1,5 +1,7 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
+from applications.users.backends import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from applications.utilidades.models import (
     TipoActoAdministrativo, 
@@ -7,63 +9,77 @@ from applications.utilidades.models import (
     Alcaldia, 
     Modalidades
 )
-from .models import Expediente, InformacionGeneral
+from .models import *
 from .serializers import (
-    ExpedienteSerializerViewset,
-    ExpedienteCreacion
+    ExpedienteCreacion,
+    ActuacionPosteriorSerializer,
+    DireccionesSerializer,
+    FotosSerializer
 )
 
 class ExpedienteViewset(viewsets.ViewSet):
 
+    authentication_classes = (JWTAuthentication,)
+    permission_classes = [IsAuthenticated]
+
     def list(self, request, *args, **kwargs):
-        queryset = Expediente.objects.all()
-        serializer = ExpedienteSerializerViewset(queryset, many=True)
-        return Response(serializer.data)
+        # queryset = Expediente.objects.informacion_expediente()
+        # serializer = ExpedienteCreacion(queryset, many=True)
+        return Response({
+            '', ''
+        })
 
     def create(self, request):
 
         serializer =ExpedienteCreacion(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        exp = Expediente.objects.create(
-            no_radicacion = serializer.validated_data['no_radicacion'],
-            documento_final = serializer.validated_data['documento_final'],
-            fecha_radicacion = serializer.validated_data['fecha_radicacion'],
-            fecha_expedicion = serializer.validated_data['fecha_expedicion'],
-            fecha_ejecutoria = serializer.validated_data['fecha_ejecutoria'],
-            fecha_inicio = serializer.validated_data['fecha_inicio'],
-            fecha_final = serializer.validated_data['fecha_final'],
-            tipo_acto_administrativo = TipoActoAdministrativo.objects.filter(id=serializer.validated_data['tipo_acto_administrativo']).get(),
-            #usuario = self.request.user
-        )
+        exp = Expediente.objects.crear_o_actualizar_expediente(serializer.validated_data)
+        inf = InformacionGeneral.objects.crear_o_actualizar_informacion(exp, serializer.validated_data)
 
-        inf = InformacionGeneral.objects.create(
-            no_radicacion = exp,
-            tramite = Tramite.objects.filter(id=serializer.validated_data['tramite']).get(),
-            alcaldia = Alcaldia.objects.filter(id=serializer.validated_data['alcaldia']).get(),
-            urbanizacion = serializer.validated_data['urbanizacion']
-        )
+        content = {
+            'message': 'ok',
+            'id': exp.id,
+        }
 
-        modalidades = Modalidades.objects.filter(
-            id__in = serializer.validated_data['modalidades']
-        )
-        print(modalidades)
+        return  Response(content, status = status.HTTP_201_CREATED)
 
-        for modalidad in modalidades:
-            inf.modalidades.add(modalidad)
+    def update(self, request, pk=None):
 
-        return  Response({
-            'ok': 'ok',
-            'data': exp.id
-        })
+        serializer =ExpedienteCreacion(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        exp = Expediente.objects.crear_o_actualizar_expediente(serializer.validated_data)
+        inf = InformacionGeneral.objects.crear_o_actualizar_informacion(exp, serializer.validated_data)
+
+        content = {
+            'message': 'ok',
+            'id': exp.id,
+        }
+
+        return  Response(content, status = status.HTTP_200_OK)
+
+        
 
     def retrieve(self, request, pk=None):
-        expediente = get_object_or_404(Expediente.objects.all(), pk=pk)
-        serializer = ExpedienteSerializerViewset(expediente)
-        return Response(serializer.data)
-
-    def partial_update(self, request, pk=None):
-        expediente = get_object_or_404(Expediente.objects.all(), pk=pk)
+        expediente = get_object_or_404(Expediente.objects.informacion_expediente(), pk=pk)
         serializer = ExpedienteCreacion(expediente)
-        print(expediente)
-        return Response(serializer.data)
+        return Response(serializer.data)   
+
+
+class ActuacionesPosterioresViewset(viewsets.ModelViewSet):
+
+    serializer_class = ActuacionPosteriorSerializer
+    queryset = ActuacionPosterior.objects.all()
+
+
+class DireccionesViewset(viewsets.ModelViewSet):
+
+    serializer_class = DireccionesSerializer
+    queryset = Direcciones.objects.all()
+
+
+class FotosViewset(viewsets.ModelViewSet):
+
+    serializer_class = FotosSerializer
+    queryset = Fotos.objects.all()

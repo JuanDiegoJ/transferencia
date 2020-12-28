@@ -6,7 +6,7 @@ from applications.utilidades.models import (
     Alcaldia,
     Modalidades
 )
-from .managers import ExpedienteManager
+from .managers import ExpedienteManager, InformacionGeneralManager
 from applications.users.models import User
 # Create your models here.
 
@@ -100,7 +100,7 @@ class InformacionGeneral(TimeStampedModel):
     )
     modalidades = models.ManyToManyField(Modalidades, blank = True)
 
-    objects = ExpedienteManager()
+    objects = InformacionGeneralManager()
 
     def __str__(self):
         return self.no_radicacion.no_radicacion

@@ -6,4 +6,5 @@ urlpatterns = [
     re_path('', include('applications.users.urls')),
     re_path('', include('applications.utilidades.urls')),
     re_path('', include('applications.expediente.routers')),
+    re_path('', include('applications.transferir.routers')),
 ]

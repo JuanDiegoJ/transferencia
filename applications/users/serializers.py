@@ -32,7 +32,6 @@ class LoginSerializer(serializers.Serializer):
 
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True)
-    first_name = serializers.CharField(required=False)
 
 
 class UserSerializer(serializers.ModelSerializer):

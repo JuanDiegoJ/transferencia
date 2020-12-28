@@ -5,4 +5,9 @@ admin.site.register(Alcaldia)
 admin.site.register(Documento)
 admin.site.register(TipoActoAdministrativo)
 admin.site.register(Tramite)
-admin.site.register(Modalidades)
+
+class ModalidadesAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'modalidad')
+
+
+admin.site.register(Modalidades, ModalidadesAdmin)
